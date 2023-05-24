@@ -1,0 +1,73 @@
+{
+    "id": "MTAAnalysis",
+    "name": "Run MTA analysis",
+    "version": "1.0v",
+    "start": "GetApplication",
+    "functions": [
+        
+        {
+            "name": "debug",
+            "type": "custom",
+            "operation": "sysout"
+        },
+        {
+            "name": "getApplication",
+            "type": "custom",
+            "operation": "rest:get:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com/hub/applications"
+        }
+    ],
+    "states": [
+        {
+            "name": "GetApplication",
+            "type": "operation",
+            "actionMode": "sequential",
+            "actions": [
+                {
+                    "name": "getApp",
+                    "functionRef": "getApplication",
+                    "actionDataFilter": {
+                        "results": ".[0]",
+                        "toStateData": ".applicationInfo"
+                    }
+                },
+                {
+                    "name": "debug",
+                    "functionRef": {
+                        "refName": "debug",
+                        "arguments": {
+                            "message": ".applicationInfo.name, .applicationInfo.repository.url"
+                        }
+                    }
+                }               
+            ],
+            "transition": "CreateAnalysis"
+        },
+        {
+            "name": "CreateAnalysis",
+            "type": "inject",
+            "data": {
+                "applicationID": ".applicationInfo.id",
+                "repositoryURL": ".applicationInfo.repository.url"
+                
+            },
+            "transition": "PrintResult"
+        },
+        {
+            "name": "PrintResult",
+            "type": "operation",
+            "actionMode": "sequential",
+            "actions": [
+                {
+                    "name": "printAction",
+                    "functionRef": {
+                        "refName": "debug",
+                        "arguments": {
+                            "message": ".applicationID"
+                        }
+                    }
+                }
+            ],
+            "end": true
+        }
+    ]
+}
