@@ -13,7 +13,12 @@
         {
             "name": "getApplication",
             "type": "custom",
-            "operation": "rest:get:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com/hub/applications"
+            "operation": "rest:get:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com:443/hub/applications"
+        },
+        {
+            "name": "createTaskgroup",
+            "type": "custom",
+            "operation": "rest:post:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com:443/hub/taskgroups"
         }
     ],
     "states": [
@@ -26,8 +31,7 @@
                     "name": "getApp",
                     "functionRef": "getApplication",
                     "actionDataFilter": {
-                        "results": ".[0]",
-                        "toStateData": ".applicationInfo"
+                        "results": "{applicationID: .[0].id, repositoryURL:.[0].repository.url}"
                     }
                 },
                 {
@@ -35,21 +39,27 @@
                     "functionRef": {
                         "refName": "debug",
                         "arguments": {
-                            "message": ".applicationInfo.name, .applicationInfo.repository.url"
+                            "message": ".applicationID, .repositoryURL"
                         }
                     }
                 }               
             ],
-            "transition": "CreateAnalysis"
+            "transition": "CreateTaskgroup"
         },
         {
-            "name": "CreateAnalysis",
-            "type": "inject",
-            "data": {
-                "applicationID": ".applicationInfo.id",
-                "repositoryURL": ".applicationInfo.repository.url"
-                
-            },
+            "name": "CreateTaskgroup",
+            "type": "operation",
+            "actionMode": "sequential",
+            "actions": [
+                {
+                    "functionRef":{
+                        "refName": "createTaskgroup",
+                        "arguments": {
+                            "data":  {}
+                        }
+                    }
+                }
+            ],
             "transition": "PrintResult"
         },
         {
