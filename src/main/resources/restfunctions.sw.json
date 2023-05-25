@@ -19,6 +19,16 @@
             "name": "createTaskgroup",
             "type": "custom",
             "operation": "rest:post:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com:443/hub/taskgroups"
+        },
+        {
+            "name": "submitTaskgroup",
+            "type": "custom",
+            "operation": "rest:put:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com:443/hub/taskgroups/{id}/submit"
+        },
+        {
+            "name": "getTaskgroup",
+            "type": "custom",
+            "operation": "rest:get:https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com:443/hub/taskgroups/{id}"
         }
     ],
     "states": [
@@ -55,24 +65,57 @@
                     "functionRef":{
                         "refName": "createTaskgroup",
                         "arguments": {
-                            "data":  {}
+                            "name": "taskgroup.windup",
+                            "addon": "windup",
+                            "data":  {
+                                "output": "/windup/report",
+                                "rules": {"path": ""},
+                                "scope": {"withKnown": false },
+                                "sources": [],
+                                "targets": [ "cloud-readiness"]
+                                
+                            },
+                            "tasks": [
+                                {
+                                "name": "parodos.windup",
+                                "application": {"id": ".applicationID" }
+                                }
+                            ]
                         }
+                    },
+                    "actionDataFilter": {
+                        "toStateData": ".taskgroup"
                     }
                 }
             ],
-            "transition": "PrintResult"
+            "transition": "SubmitAnalysis"
         },
         {
-            "name": "PrintResult",
+            "name": "SubmitAnalysis",
             "type": "operation",
             "actionMode": "sequential",
             "actions": [
                 {
-                    "name": "printAction",
+                    "name": "submitTaskgroup",
                     "functionRef": {
-                        "refName": "debug",
+                        "refName": "submitTaskgroup",
+                        "arguments": ".taskgroup"
+                    }
+                }
+            ],
+            "transition": "GetAnalysis"
+        },
+        {
+            "name": "GetAnalysis",
+            "type": "operation",
+            "actionMode": "sequential",
+            "actions": [
+                {
+                    "name": "getTaskgroup",
+                    "functionRef": {
+                        "refName": "getTaskgroup",
                         "arguments": {
-                            "message": ".applicationID"
+                            "id": ".taskgroup.id"
                         }
                     }
                 }
