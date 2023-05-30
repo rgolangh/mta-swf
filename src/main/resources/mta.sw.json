@@ -60,7 +60,7 @@
                 
             ],
             "stateDataFilter": {
-                "output": "{repositoryURL: .repositoryURL, application: .repositoryURL as $r|.applications|map(select(.repository.url == $r))[0]}"
+                "output": "{repositoryURL: .repositoryURL, application: .repositoryURL as $r| if .applications == null then null else .applications|map(select(.repository.url == $r))[0] end}"
             },
             
             "transition": "AppExist"
@@ -87,7 +87,7 @@
                     "functionRef": {
                         "refName": "createApplication",
                         "arguments": {
-                            "name": "swf-mta",
+                            "name": ".repositoryURL",
                             "repository": {
                                 "url": ".repositoryURL",
                                 "kind": "git"
