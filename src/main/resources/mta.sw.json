@@ -2,8 +2,8 @@
     "id": "MTAAnalysis",
     "name": "Run MTA analysis",
     "version": "1.0v",
-    "constants": {
-        "mtaURL": "https://mta-openshift-mta.apps.parodos-dev.projects.ecosystem.sysdeseng.com"
+    "timeouts": {
+        "workflowExecTimeout": "PT1H"
     },
     "start": "GetApplication",
     "functions": [

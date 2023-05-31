@@ -3,10 +3,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.kie.kogito.examples</groupId>
-  <artifactId>serverless-workflow-functions-quarkus</artifactId>
+  <artifactId>mta-kogito-serverless-workflow</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Kogito Example :: Serverless Workflow Functions :: Quarkus</name>
-  <description>Kogito Serverless Workflow Example - Quarkus</description>
+  <name>MTA workflow using kogito serverless Quarkus</name>
   <properties>
     <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
     <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
@@ -78,6 +77,14 @@
     <dependency>
       <groupId>org.kie.kogito</groupId>
       <artifactId>kogito-addons-quarkus-source-files</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-kubernetes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-knative-eventing</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
