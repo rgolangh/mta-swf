@@ -9,7 +9,7 @@
   <properties>
     <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
     <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <kogito.bom.version>1.36.1.Final</kogito.bom.version>
+    <kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
     <maven.compiler.release>11</maven.compiler.release>
     <quarkus-plugin.version>2.16.4.Final</quarkus-plugin.version>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
@@ -20,6 +20,14 @@
     <version.compiler.plugin>3.8.1</version.compiler.plugin>
     <version.failsafe.plugin>3.0.0-M7</version.failsafe.plugin>
   </properties>
+  <repositories>
+
+    <repository>
+        <id>jboss nexus</id>
+        <name>jboss nexus</name>
+        <url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -80,11 +88,15 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-kubernetes</artifactId>
+      <artifactId>quarkus-openshift</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>
       <artifactId>kogito-addons-quarkus-knative-eventing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-container-image-openshift</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -159,7 +171,7 @@
       <dependencies>
         <dependency>
           <groupId>io.quarkus</groupId>
-          <artifactId>quarkus-container-image-jib</artifactId>
+          <artifactId>quarkus-container-image-openshift</artifactId>
         </dependency>
       </dependencies>
     </profile>
