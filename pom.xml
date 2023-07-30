@@ -20,14 +20,6 @@
     <version.compiler.plugin>3.8.1</version.compiler.plugin>
     <version.failsafe.plugin>3.0.0-M7</version.failsafe.plugin>
   </properties>
-  <repositories>
-
-    <repository>
-        <id>jboss nexus</id>
-        <name>jboss nexus</name>
-        <url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -99,6 +91,10 @@
       <artifactId>quarkus-container-image-openshift</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-process-management</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
@@ -115,6 +111,13 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>jboss nexus</id>
+      <name>jboss nexus</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
   <build>
     <finalName>${project.artifactId}</finalName>
     <plugins>
