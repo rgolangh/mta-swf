@@ -1,17 +1,10 @@
-# Kogito Serverless Workflow - Rest Example
+# MTA analysis using Sonata Serverless Workflow
 
 ## Description
 
-This example contains a workflow that performs two consecutive REST invocations defined as functions.  
-The workflow is described using JSON format as defined in the 
-[CNCF Serverless Workflow specification](https://github.com/cncf/wg-serverless/tree/main/workflow/spec).
+This is a port of Parodos workflow written entirely in serverless workflow with sonataflow.
 
-The workflow expects a JSON input containing a collections of numbers.
-
-The workflow starts invoking a GET to obtain a random integer. 
-This integer is passed together with the list of numbers to  a second REST invocation, a POST, which multiply each element of the array by the generated number
-and returns the sum. 
-Finally, the resulting integer is printed using sysout script. 
+It performs consecutive REST invocations defined as functions.  
 
 ## Installing and Running
 
@@ -62,54 +55,24 @@ To run the generated native executable, generated in `target/`, execute
 
 ### Submit a request
 
-The service based on the JSON workflow definition can be access by sending a request to http://localhost:8080/RESTExample'
-with following content 
+To invoke an MTA analysis using this workflow make sure you have an MTA service running.
+Specify the endpoint in workflow spec under the function section `src/main/resources/mta.sw.yaml`
 
-```json
-{
-  "inputNumbers": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    7
-  ]
-}
+```yaml
+// showing only the functions section
+functions:
+- name: getApplication
+  type: custom
+  operation: rest:get:https://mta.example.org:443/hub/applications
 ```
 
-Complete curl command can be found below:
+Execute the flow using curl with this payload:
 
 ```sh
-curl -X POST -H 'Content-Type:application/json' -H 'Accept:application/json' -d '{"inputNumbers": [1,2,3,4,5,6,7,8,7]}' http://localhost:8080/RestExample
+curl -XPOST -H "Content-Type: application/json" http://localhost:8080/MTAAnalysis -d '{"repositoryURL": "https://github.com/your/repo"}'
 ```
 
-Log after curl executed:
 
-```json
-{
-  "inputNumbers": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    7
-  ]
-}
-```
-
-In Quarkus you should see the log message printed:
-
-```text
-The sum is: 387
-```
 ## Deploying with Kogito Operator
 
 In the [`operator`](operator) directory you'll find the custom resources needed to deploy this example on OpenShift with the [Kogito Operator](https://docs.jboss.org/kogito/release/latest/html_single/#chap_kogito-deploying-on-openshift).
