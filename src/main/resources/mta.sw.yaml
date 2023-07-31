@@ -6,6 +6,7 @@ version: 1.0v
 timeouts:
   workflowExecTimeout: PT1H
 start: GetApplication
+dataInputSchema: mta-schema.json
 functions:
 - name: debug
   type: custom
