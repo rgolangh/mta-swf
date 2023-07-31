@@ -1,22 +1,18 @@
-package org.kie.kogito.app;
+package org.rgo;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Singleton;
 
 import org.kie.api.event.process.ProcessCompletedEvent;
-import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.process.ProcessNodeLeftEvent;
 import org.kie.api.event.process.ProcessNodeTriggeredEvent;
 import org.kie.api.event.process.ProcessStartedEvent;
 import org.kie.api.event.process.ProcessVariableChangedEvent;
-import org.kie.api.event.process.SignalEvent;
 import org.kie.kogito.internal.process.event.KogitoProcessEventListener;
 import org.kie.kogito.internal.process.event.ProcessWorkItemTransitionEvent;
 import org.kie.kogito.internal.process.runtime.KogitoProcessInstance;
@@ -37,6 +33,10 @@ public class StorageEventListeners implements KogitoProcessEventListener {
         try {
             String instanceID = ((KogitoProcessInstance) processStartedEvent.getProcessInstance()).getStringId();
             Path of = Path.of("/tmp/", instanceID);
+            if (of.toFile().exists()) {
+                // just continue for now
+                return;
+            }
             System.out.println("creating " + of);
             Path tempFile = Files.createDirectory(of);
             System.out.println("created directory " + tempFile.toAbsolutePath());
@@ -49,7 +49,14 @@ public class StorageEventListeners implements KogitoProcessEventListener {
 
     @Override
     public void afterWorkItemTransition(ProcessWorkItemTransitionEvent event) {
-        System.out.println("Transition to " + event.getTransition());
+        if (event.getProcessInstance().getState() == KogitoProcessInstance.STATE_ABORTED
+                ||  event.getProcessInstance().getState() == KogitoProcessInstance.STATE_ERROR ) {
+            // aborting or in error state -> clean up after you
+            System.out.println("this flow is in error or aborted state");
+            String instanceID = ((KogitoProcessInstance) event.getProcessInstance()).getStringId();
+            cleanup(instanceID);
+        }
+        System.out.println("Transition to ->" + event.getProcessInstance().getState());
     }
 
     @Override
@@ -61,7 +68,9 @@ public class StorageEventListeners implements KogitoProcessEventListener {
 
     @Override
     public void beforeProcessCompleted(ProcessCompletedEvent processCompletedEvent) {
+        System.out.println("process completed event");
         String instanceID = ((KogitoProcessInstance) processCompletedEvent.getProcessInstance()).getStringId();
+
         cleanup(instanceID);
 
     }
@@ -88,13 +97,14 @@ public class StorageEventListeners implements KogitoProcessEventListener {
         }
     }
 
-    @Override
-    public void onError() {
-        cleanup(null);
-    }
+//    @Override
+//    public void onError() {
+//        cleanup(null);
+//    }
 
     @Override
     public void afterProcessCompleted(ProcessCompletedEvent processCompletedEvent) {
+        System.out.println("after process completed event");
     }
 
     @Override
