@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Singleton;
@@ -15,15 +16,24 @@ import org.kie.api.event.process.ProcessNodeLeftEvent;
 import org.kie.api.event.process.ProcessNodeTriggeredEvent;
 import org.kie.api.event.process.ProcessStartedEvent;
 import org.kie.api.event.process.ProcessVariableChangedEvent;
+import org.kie.api.event.process.SignalEvent;
 import org.kie.kogito.internal.process.event.KogitoProcessEventListener;
+import org.kie.kogito.internal.process.event.ProcessWorkItemTransitionEvent;
 import org.kie.kogito.internal.process.runtime.KogitoProcessInstance;
 
+
+/**
+ * Event listeners to handle storage per execution, where each process
+ * will have a scratch space mounted under /var/run/sonataflow/${instanceId}/ on start
+ * and will be removed on end, either complete or error state.
+ */
 @ApplicationScoped
 public class StorageEventListeners implements KogitoProcessEventListener {
 
 
     @Override
     public void beforeProcessStarted(ProcessStartedEvent processStartedEvent) {
+        // TODO find out in what cases we might have the folder already exists and handle that
         try {
             String instanceID = ((KogitoProcessInstance) processStartedEvent.getProcessInstance()).getStringId();
             Path of = Path.of("/tmp/", instanceID);
@@ -38,25 +48,53 @@ public class StorageEventListeners implements KogitoProcessEventListener {
     }
 
     @Override
+    public void afterWorkItemTransition(ProcessWorkItemTransitionEvent event) {
+        System.out.println("Transition to " + event.getTransition());
+    }
+
+    @Override
     public void afterProcessStarted(ProcessStartedEvent processStartedEvent) {
 
     }
 
+
+
     @Override
     public void beforeProcessCompleted(ProcessCompletedEvent processCompletedEvent) {
+        String instanceID = ((KogitoProcessInstance) processCompletedEvent.getProcessInstance()).getStringId();
+        cleanup(instanceID);
 
+    }
+
+    private static void cleanup(String instanceID) {
+        if (instanceID == null || instanceID.isBlank()) {
+            return;
+        }
+        try {
+            Path of = Path.of("/tmp/", instanceID);
+            if (!of.toFile().exists() || !of.toFile().isDirectory()) {
+                return;
+            }
+            // TODO replace with logger calls
+            System.out.println("Removing directory " + of);
+            Files.walk(of)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            // TODO replace with logger calls
+            System.out.println("Removed directory" + of);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void onError() {
+        cleanup(null);
     }
 
     @Override
     public void afterProcessCompleted(ProcessCompletedEvent processCompletedEvent) {
-        String instanceID = ((KogitoProcessInstance) processCompletedEvent.getProcessInstance()).getStringId();
-        try {
-            Path of = Path.of("/tmp/", instanceID);
-            System.out.println("removing " + of);
-            Files.delete(of);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
