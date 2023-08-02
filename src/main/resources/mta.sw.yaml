@@ -2,6 +2,8 @@
 specVersion: 0.8
 id: MTAAnalysis
 name: Run MTA analysis
+annotations:
+  - "workflow-type/infrastructure"
 version: 1.0v
 timeouts:
   workflowExecTimeout: PT1H
