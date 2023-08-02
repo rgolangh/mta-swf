@@ -1,0 +1,22 @@
+---
+specVersion: 0.8
+id: hello
+name: hello wf
+annotations:
+  - "workflow-type/infrastructure"
+version: v0.1
+timeouts:
+  workflowExecTimeout: PT1H
+start: Get
+functions:
+- name: hello
+  type: custom
+  operation: rest:get:http://example.org
+states:
+- name: Get
+  type: operation
+  actionMode: sequential
+  actions:
+  - name: hello
+    functionRef: hello
+  end: true
