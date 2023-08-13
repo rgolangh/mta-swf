@@ -11,7 +11,7 @@ start: Get
 functions:
 - name: hello
   type: custom
-  operation: rest:get:http://example.org
+  operation: rest:get:http://localhost:8080/q/health
 states:
 - name: Get
   type: operation

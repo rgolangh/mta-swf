@@ -34,6 +34,10 @@ functions:
 - name: customServiceCall
   type: custom
   operation: service:java:org.rgo.ServiceImpl::manipulate
+events:
+  - name: foo
+    type: kogito.sw.foo
+    kind: produced
 states:
 - name: GetApplication
   type: operation
@@ -54,7 +58,10 @@ states:
   type: switch
   dataConditions:
   - condition: ".application != null"
-    transition: CreateTaskgroup
+    transition:
+      nextState: CreateTaskgroup
+      produceEvents:
+        - eventRef: foo
   defaultCondition:
     transition: CreateApplication
 

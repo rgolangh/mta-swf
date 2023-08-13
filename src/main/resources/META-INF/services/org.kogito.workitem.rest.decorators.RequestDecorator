@@ -1,1 +1,2 @@
-com.redhat.mta.SSLRequestDecorator
+#request decorator is not needed anymore
+#com.redhat.mta.SSLRequestDecorator
